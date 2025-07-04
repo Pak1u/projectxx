@@ -18,9 +18,33 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (email: string, password: string, role: 'EMPLOYEE' | 'VENDOR', name: string) => Promise<boolean>;
+  // Development helper functions
+  loginAsEmployee: () => void;
+  loginAsVendor: () => void;
 }
 
 const API_BASE = 'http://localhost:4000';
+
+// Hardcoded development credentials
+const DEV_CREDENTIALS = {
+  EMPLOYEE: {
+    email: 'employee@dev.com',
+    password: 'employee123',
+    name: 'John Employee',
+    role: 'EMPLOYEE' as const,
+    token: 'dev-employee-token-12345'
+  },
+  VENDOR: {
+    email: 'vendor@dev.com', 
+    password: 'vendor123',
+    name: 'Jane Vendor',
+    role: 'VENDOR' as const,
+    token: 'dev-vendor-token-67890'
+  }
+};
+
+// Set this to true to enable development mode (bypasses backend)
+const DEV_MODE = true;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -48,7 +72,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Development helper functions
+  const loginAsEmployee = () => {
+    const devUser = DEV_CREDENTIALS.EMPLOYEE;
+    setToken(devUser.token);
+    setRole(devUser.role);
+    setEmail(devUser.email);
+    setName(devUser.name);
+    setIsLoggedIn(true);
+    localStorage.setItem('token', devUser.token);
+    localStorage.setItem('role', devUser.role);
+    localStorage.setItem('email', devUser.email);
+    localStorage.setItem('name', devUser.name);
+  };
+
+  const loginAsVendor = () => {
+    const devUser = DEV_CREDENTIALS.VENDOR;
+    setToken(devUser.token);
+    setRole(devUser.role);
+    setEmail(devUser.email);
+    setName(devUser.name);
+    setIsLoggedIn(true);
+    localStorage.setItem('token', devUser.token);
+    localStorage.setItem('role', devUser.role);
+    localStorage.setItem('email', devUser.email);
+    localStorage.setItem('name', devUser.name);
+  };
+
   const login = async (email: string, password: string) => {
+    // Check if using hardcoded credentials in dev mode
+    if (DEV_MODE) {
+      if (email === DEV_CREDENTIALS.EMPLOYEE.email && password === DEV_CREDENTIALS.EMPLOYEE.password) {
+        loginAsEmployee();
+        return true;
+      }
+      if (email === DEV_CREDENTIALS.VENDOR.email && password === DEV_CREDENTIALS.VENDOR.password) {
+        loginAsVendor();
+        return true;
+      }
+    }
+
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
@@ -85,6 +148,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (email: string, password: string, role: 'EMPLOYEE' | 'VENDOR', name: string) => {
+    // In dev mode, just log in directly with the provided credentials
+    if (DEV_MODE) {
+      if (role === 'EMPLOYEE') {
+        setToken(DEV_CREDENTIALS.EMPLOYEE.token);
+        setRole(role);
+        setEmail(email);
+        setName(name);
+        setIsLoggedIn(true);
+        localStorage.setItem('token', DEV_CREDENTIALS.EMPLOYEE.token);
+        localStorage.setItem('role', role);
+        localStorage.setItem('email', email);
+        localStorage.setItem('name', name);
+        return true;
+      } else if (role === 'VENDOR') {
+        setToken(DEV_CREDENTIALS.VENDOR.token);
+        setRole(role);
+        setEmail(email);
+        setName(name);
+        setIsLoggedIn(true);
+        localStorage.setItem('token', DEV_CREDENTIALS.VENDOR.token);
+        localStorage.setItem('role', role);
+        localStorage.setItem('email', email);
+        localStorage.setItem('name', name);
+        return true;
+      }
+    }
+
     try {
       let body: any = { email, password, role };
       if (role === 'VENDOR') {
@@ -115,7 +205,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, role, email, name, isLoggedIn, user, login, logout, register }}>
+    <AuthContext.Provider value={{ 
+      token, 
+      role, 
+      email, 
+      name, 
+      isLoggedIn, 
+      user, 
+      login, 
+      logout, 
+      register,
+      loginAsEmployee,
+      loginAsVendor
+    }}>
       {children}
     </AuthContext.Provider>
   );

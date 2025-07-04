@@ -3,6 +3,7 @@
 import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import Navbar from './components/Navbar';
+import DevLogin from '../components/DevLogin';
 
 export default function RootLayout({
   children,
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body className="bg-gray-50">
         <AuthProvider>
           <Navbar />
+          <DevLogin />
           <main className="min-h-screen">
             {children}
           </main>

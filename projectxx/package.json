@@ -7,7 +7,8 @@
     "dev:next": "next dev",
     "dev:server": "ts-node src/server.ts",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "front": "next dev --turbo --port 3000"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",

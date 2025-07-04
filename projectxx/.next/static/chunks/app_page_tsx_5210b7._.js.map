@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":["/turbopack/[project]/app/page.tsx"],"sourcesContent":["\"use client\";\r\nimport React from 'react';\r\n\r\nexport default function HomePage() {\r\n  return (\r\n    <div className=\"flex flex-col items-center justify-center min-h-[60vh]\">\r\n      <h2 className=\"text-3xl font-semibold mb-6\">Welcome to Walmart Inventory Manager</h2>\r\n      <p className=\"text-gray-600 text-lg\">Manage your inventory efficiently.</p>\r\n    </div>\r\n  );\r\n} "],"names":[],"mappings":";;;;;AAAA;;AAGe,SAAS;IACtB,qBACE,6LAAC;QAAI,WAAU;;0BACb,6LAAC;gBAAG,WAAU;0BAA8B;;;;;;0BAC5C,6LAAC;gBAAE,WAAU;0BAAwB;;;;;;;;;;;;AAG3C;KAPwB"}},
+    {"offset": {"line": 42, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
