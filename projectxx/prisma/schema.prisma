@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  VENDOR
+  EMPLOYEE
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum DeliveryStatus {
+  PENDING
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+}
+
+enum InventoryLocation {
+  BUFFER
+  TRANSIT
+  PRESENT
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String
+  role       Role
+  vendor     Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId   String?  @unique
+  employee   WalmartEmployee? @relation(fields: [employeeId], references: [id])
+  employeeId String?  @unique
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  vendorAssignments   Assignment[] @relation("VendorAssignments")
+  employeeAssignments Assignment[] @relation("EmployeeAssignments")
+}
+
+model Vendor {
+  id      String @id @default(cuid())
+  name    String
+  contact String
+  user    User?
+  orders  Order[]
+}
+
+model WalmartEmployee {
+  id       String @id @default(cuid())
+  name     String
+  position String
+  user     User?
+  billingRecords BillingRecord[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  vendorId    String
+  createdAt   DateTime    @default(now())
+  status      OrderStatus
+  items       OrderItem[]
+  totalAmount Float
+  deliveries  Delivery[]
+  billingRecords BillingRecord[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  itemName  String
+  quantity  Int
+  unitPrice Float
+}
+
+model Delivery {
+  id           String         @id @default(cuid())
+  order        Order          @relation(fields: [orderId], references: [id])
+  orderId      String
+  status       DeliveryStatus
+  deliveryDate DateTime
+  truckId      String?
+}
+
+model InventoryItem {
+  id       String            @id @default(cuid())
+  name     String
+  quantity Int
+  location InventoryLocation
+}
+
+model BillingRecord {
+  id             String           @id @default(cuid())
+  order          Order            @relation(fields: [orderId], references: [id])
+  orderId        String
+  generatedBy    WalmartEmployee  @relation(fields: [generatedById], references: [id])
+  generatedById  String
+  amount         Float
+  generatedAt    DateTime         @default(now())
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  content    String
+  timestamp  DateTime @default(now())
+  isRead     Boolean  @default(false)
+
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+model Assignment {
+  id         String @id @default(cuid())
+  vendorId   String
+  employeeId String
+
+  vendor     User   @relation("VendorAssignments", fields: [vendorId], references: [id])
+  employee   User   @relation("EmployeeAssignments", fields: [employeeId], references: [id])
+
+  @@unique([vendorId, employeeId])
+}
