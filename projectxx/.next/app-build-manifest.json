@@ -16,6 +16,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/login/page.js"
     ],
+    "/register/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/register/page.js"
+    ],
+    "/employee/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/employee/dashboard/page.js"
+    ],
     "/messages/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
