@@ -12,31 +12,21 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
 // GET /api/employee/inventory
 router.get('/', authenticateToken, requireAuth, requireRole('EMPLOYEE'), asyncHandler(async (req, res) => {
   const items = await prisma.inventoryItem.findMany();
-  const grouped = items.reduce((acc: Record<string, InventoryItem[]>, item: InventoryItem) => {
-    (acc[item.location] = acc[item.location] || []).push(item);
-    return acc;
-  }, {} as Record<string, InventoryItem[]>);
-  res.json({ inventory: grouped });
+  res.json(items);
 }));
 
 interface UpdateInventoryBody {
-  quantity?: number;
-  location?: keyof typeof InventoryLocation;
+  name?: string;
+  price?: number;
 }
 // PATCH /api/employee/inventory/:itemId
 router.patch('/:itemId', authenticateToken, requireAuth, requireRole('EMPLOYEE'), asyncHandler(async (req, res) => {
   const { itemId } = req.params;
-  const { quantity, location } = req.body as UpdateInventoryBody;
+  const { name, price } = req.body as UpdateInventoryBody;
   const data: any = {};
-  if (quantity !== undefined) data.quantity = quantity;
-  if (location !== undefined) {
-    if (!Object.values(InventoryLocation).includes(location as any)) {
-      res.status(400).json({ error: 'Invalid location' });
-      return;
-    }
-    data.location = location;
-  }
-  const item = await prisma.inventoryItem.update({ where: { id: itemId }, data });
+  if (name !== undefined) data.name = name;
+  if (price !== undefined) data.price = price;
+  const item = await prisma.inventoryItem.update({ where: { id: parseInt(itemId, 10) }, data });
   res.json(item);
 }));
 

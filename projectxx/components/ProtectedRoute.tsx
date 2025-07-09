@@ -6,12 +6,13 @@ import { useRouter } from 'next/navigation';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole: 'EMPLOYEE' | 'VENDOR';
+  requiredRole: 'EMPLOYEE' | 'VENDOR' | 'ADMIN';
 }
 
 const dashboardPath = {
   EMPLOYEE: '/employee/dashboard',
   VENDOR: '/vendor/dashboard',
+  ADMIN: '/admin/dashboard',
 };
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {

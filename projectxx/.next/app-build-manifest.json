@@ -11,25 +11,45 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/login/page": [
+    "/marketplace/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
+      "static/chunks/app/marketplace/page.js"
     ],
-    "/register/page": [
+    "/employee/request/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/register/page.js"
+      "static/chunks/app/employee/request/page.js"
     ],
-    "/employee/dashboard/page": [
+    "/marketplace/request/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/employee/dashboard/page.js"
+      "static/chunks/app/marketplace/request/[id]/page.js"
+    ],
+    "/transit/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/transit/page.js"
     ],
     "/messages/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/messages/page.js"
+    ],
+    "/vendor/billing/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/vendor/billing/page.js"
+    ],
+    "/vendor/inventory/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/vendor/inventory/page.js"
+    ],
+    "/vendor/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/vendor/dashboard/page.js"
     ]
   }
 }

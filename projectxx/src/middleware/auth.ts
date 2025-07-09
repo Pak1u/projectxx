@@ -11,8 +11,8 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     return;
   }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: 'VENDOR' | 'EMPLOYEE' };
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: 'VENDOR' | 'EMPLOYEE' | 'ADMIN' };
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
@@ -21,16 +21,16 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!(req as any).user) {
+  if (!req.user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
   next();
 }
 
-export function requireRole(role: 'VENDOR' | 'EMPLOYEE') {
+export function requireRole(...roles: Array<'VENDOR' | 'EMPLOYEE' | 'ADMIN'>) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    if (!(req as any).user || (req as any).user.role !== role) {
+    if (!req.user || !roles.includes(req.user.role)) {
       res.status(403).json({ error: 'Forbidden: Insufficient role' });
       return;
     }

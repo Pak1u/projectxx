@@ -119,6 +119,7 @@
   },
   "include": [
     "src",
+    "src/types",
     "generated/prisma",
     ".next/types/**/*.ts"
   ],

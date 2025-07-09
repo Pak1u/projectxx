@@ -22,11 +22,16 @@ router.post('/generate', authenticateToken, requireAuth, requireRole('EMPLOYEE')
     res.status(403).json({ error: 'Employee not found' });
     return;
   }
+  if (!employee.warehouseId) {
+    res.status(400).json({ error: 'Employee is not assigned to a warehouse' });
+    return;
+  }
   const billing = await prisma.billingRecord.create({
     data: {
       orderId,
       generatedById: employee.id,
-      amount
+      amount,
+      warehouseId: employee.warehouseId,
     }
   });
   res.status(201).json(billing);

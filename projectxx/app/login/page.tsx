@@ -16,20 +16,19 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const success = await login(email, password);
+    const loggedInRole = await login(email, password);
     setLoading(false);
-    if (success) {
-      if (role === 'VENDOR') router.push('/vendor/dashboard');
-      else if (role === 'EMPLOYEE') router.push('/employee/dashboard');
-      else router.push('/');
-    } else {
-      setError('Invalid credentials');
-    }
+    if (loggedInRole === 'VENDOR') router.push('/vendor/dashboard');
+    else if (loggedInRole === 'EMPLOYEE') router.push('/employee/dashboard');
+    else if (loggedInRole === 'ADMIN') router.push('/admin/dashboard');
+    else if (loggedInRole) router.push('/');
+    else setError('Invalid credentials');
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
       <h2 className="text-3xl font-semibold mb-4">Login Page</h2>
+      <p className="mb-4 text-gray-600 text-center">Login as Employee, Vendor, or Admin</p>
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm space-y-4">
         <input
           type="email"

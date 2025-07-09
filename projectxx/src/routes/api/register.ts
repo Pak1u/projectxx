@@ -16,6 +16,8 @@ async function registerHandler(req: Request, res: Response) {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     let userData: any = { email, password: hashedPassword, role };
+    if (req.body.latitude !== undefined) userData.latitude = req.body.latitude;
+    if (req.body.longitude !== undefined) userData.longitude = req.body.longitude;
     let name = '';
     
     if (role === 'VENDOR') {
@@ -32,6 +34,8 @@ async function registerHandler(req: Request, res: Response) {
       const createdEmployee = await prisma.walmartEmployee.create({ data: employee });
       userData.employeeId = createdEmployee.id;
       name = employee.name;
+    } else if (role === 'ADMIN') {
+      name = 'Admin';
     } else {
       return res.status(400).json({ error: 'Invalid role' });
     }

@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   VENDOR
   EMPLOYEE
+  ADMIN
 }
 
 enum OrderStatus {
@@ -34,9 +35,9 @@ enum DeliveryStatus {
 }
 
 enum InventoryLocation {
-  BUFFER
   TRANSIT
   PRESENT
+  BUFFER
 }
 
 model User {
@@ -52,6 +53,9 @@ model User {
   receivedMessages Message[] @relation("ReceivedMessages")
   vendorAssignments   Assignment[] @relation("VendorAssignments")
   employeeAssignments Assignment[] @relation("EmployeeAssignments")
+  latitude   Float?
+  longitude  Float?
+  isBanned Boolean @default(false)
 }
 
 model Vendor {
@@ -60,6 +64,10 @@ model Vendor {
   contact String
   user    User?
   orders  Order[]
+  vendorInventories VendorInventory[] @relation("VendorVendorInventories")
+  vendorTransitInventories VendorTransitInventory[] @relation("VendorVendorTransitInventories")
+  offers  Offer[]
+  routeDistances RouteDistance[]
 }
 
 model WalmartEmployee {
@@ -68,6 +76,10 @@ model WalmartEmployee {
   position String
   user     User?
   billingRecords BillingRecord[]
+  warehouse   Warehouse? @relation("EmployeeWarehouse", fields: [warehouseId], references: [id])
+  warehouseId String?
+  warehouseLogs WarehouseLog[]
+  itemRequests ItemRequest[]
 }
 
 model Order {
@@ -101,20 +113,23 @@ model Delivery {
 }
 
 model InventoryItem {
-  id       String            @id @default(cuid())
-  name     String
-  quantity Int
-  location InventoryLocation
+  id    Int    @id @default(autoincrement())
+  name  String
+  price Float
 }
 
 model BillingRecord {
   id             String           @id @default(cuid())
-  order          Order            @relation(fields: [orderId], references: [id])
-  orderId        String
+  order          Order?           @relation(fields: [orderId], references: [id])
+  orderId        String?
   generatedBy    WalmartEmployee  @relation(fields: [generatedById], references: [id])
   generatedById  String
   amount         Float
   generatedAt    DateTime         @default(now())
+  warehouse      Warehouse        @relation(fields: [warehouseId], references: [id])
+  warehouseId    String
+  itemRequest    ItemRequest?     @relation(fields: [itemRequestId], references: [id])
+  itemRequestId  String?
 }
 
 model Message {
@@ -138,4 +153,120 @@ model Assignment {
   employee   User   @relation("EmployeeAssignments", fields: [employeeId], references: [id])
 
   @@unique([vendorId, employeeId])
+}
+
+model Warehouse {
+  id        String   @id @default(cuid())
+  name      String
+  latitude  Float
+  longitude Float
+  transitInventories VendorTransitInventory[] @relation("WarehouseTransitInventories")
+  warehouseInventories WarehouseInventory[] @relation("WarehouseWarehouseInventories")
+  walmartEmployees WalmartEmployee[] @relation("EmployeeWarehouse")
+  warehouseLogs WarehouseLog[]
+  itemRequests ItemRequest[]
+  offers Offer[]
+  billingRecords BillingRecord[]
+  routeDistances RouteDistance[]
+}
+
+model VendorInventory {
+  id         String   @id @default(cuid())
+  vendor     Vendor  @relation("VendorVendorInventories", fields: [vendorId], references: [id])
+  vendorId   String
+  itemName   String
+  quantity   Int
+  price      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model VendorTransitInventory {
+  id          String     @id @default(cuid())
+  vendor      Vendor     @relation("VendorVendorTransitInventories", fields: [vendorId], references: [id])
+  vendorId    String
+  warehouse   Warehouse  @relation("WarehouseTransitInventories", fields: [warehouseId], references: [id])
+  warehouseId String
+  itemName    String
+  quantity    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model WarehouseInventory {
+  id          String     @id @default(cuid())
+  warehouse   Warehouse  @relation("WarehouseWarehouseInventories", fields: [warehouseId], references: [id])
+  warehouseId String
+  itemName    String
+  quantity    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([warehouseId, itemName])
+}
+
+model WarehouseLog {
+  id           String   @id @default(cuid())
+  employee     WalmartEmployee @relation(fields: [employeeId], references: [id])
+  employeeId   String
+  warehouse    Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId  String
+  signinTime   DateTime
+  signoutTime  DateTime?
+}
+
+model ItemRequest {
+  id          String   @id @default(cuid())
+  employee    WalmartEmployee @relation(fields: [employeeId], references: [id])
+  employeeId  String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId String
+  itemName    String
+  quantity    Int
+  createdAt   DateTime @default(now())
+  offers      Offer[]
+  status      ItemRequestStatus @default(PENDING)
+  billingRecords BillingRecord[]
+}
+
+enum ItemRequestStatus {
+  PENDING
+  FULFILLED
+}
+
+model Offer {
+  id           String   @id @default(cuid())
+  vendor       Vendor   @relation(fields: [vendorId], references: [id])
+  vendorId     String
+  itemRequest  ItemRequest @relation(fields: [itemRequestId], references: [id])
+  itemRequestId String
+  warehouse    Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId  String
+  quantity     Int
+  price        Float
+  status       OfferStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  PARTIALLY_FULFILLED
+}
+
+model RouteDistance {
+  id          String   @id @default(cuid())
+  vendorId    String
+  warehouseId String
+  distance    Float    // Distance in meters
+  travelTime  Float?   // Travel time in seconds (null if not calculated)
+  reachable   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vendor      Vendor    @relation(fields: [vendorId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([vendorId, warehouseId])
 }

@@ -17,6 +17,8 @@ interface User {
   lastMessageTime: Date | null;
 }
 
+
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -34,12 +36,9 @@ export default function Navbar() {
     });
 
     newSocket.on('availableUsers', (usersList: User[]) => {
-      // console.log('Navbar received users:', usersList);
       const filteredUsers = usersList.filter(u => u.email !== user.email);
-      // console.log('Filtered users:', filteredUsers);
       // Check if any user has unread messages (same logic as messages page)
       const hasUnread = filteredUsers.some(u => u.unreadCount > 0);
-      // console.log('Navbar - Has unread messages:', hasUnread, 'Users with unread:', filteredUsers.filter(u => u.unreadCount > 0).map(u => `${u.name}(${u.unreadCount})`));
       setHasUnreadMessages(hasUnread);
     });
 
@@ -79,6 +78,12 @@ export default function Navbar() {
     }
   }, [socket, user]);
 
+  useEffect(() => {
+    console.log("Navbar user:", user);
+    console.log("user.employee:", user?.employee);
+    console.log("user.employee?.warehouseId:", user?.employee?.warehouseId);
+  }, [user]);
+
   const handleLogout = () => {
     logout();
     router.push('/login');
@@ -102,10 +107,67 @@ export default function Navbar() {
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium relative"
                 >
                   Messages
+                  
                   {hasUnreadMessages && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-3 w-3"></span>
                   )}
                 </Link>
+                {user && ((user.role === 'VENDOR') || (user.role === 'EMPLOYEE' && user.employee?.warehouseId)) && (
+                  <Link 
+                    href="/marketplace" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Marketplace
+                  </Link>
+                )}
+                {user && ((user.role === 'VENDOR') || (user.role === 'EMPLOYEE' && user.employee?.warehouseId)) && (
+                  <Link 
+                    href="/transit" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Transit
+                  </Link>
+                )}
+                {user && user.role === 'EMPLOYEE' && (
+                  <Link 
+                    href="/employee/profile" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Profile
+                  </Link>
+                )}
+                {user && user.role === 'EMPLOYEE' && user.employee?.warehouseId && (
+                  <Link 
+                    href="/employee/billing" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Billings
+                  </Link>
+                )}
+                {user && user.role === 'VENDOR' && (
+                  <Link 
+                    href="/vendor/billing" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Billings
+                  </Link>
+                )}
+                {user && user.role === 'VENDOR' && (
+                  <Link 
+                    href="/vendor/inventory" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Inventory
+                  </Link>
+                )}
+                {user && user.role === 'EMPLOYEE' && user.employee?.warehouseId && (
+                  <Link 
+                    href="/employee/warehouse" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Warehouse
+                  </Link>
+                )}
                 <Link 
                   href={user.role === 'VENDOR' ? '/vendor/dashboard' : '/employee/dashboard'} 
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -137,6 +199,12 @@ export default function Navbar() {
                 >
                   Sign Up
                 </Link>
+                <Link
+                  href="/admin/login"
+                  className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Admin Login
+                </Link>
               </>
             )}
           </div>
@@ -145,3 +213,4 @@ export default function Navbar() {
     </nav>
   );
 } 
+

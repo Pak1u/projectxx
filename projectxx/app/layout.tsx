@@ -1,5 +1,5 @@
 "use client";
-
+import React from 'react';
 import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import Navbar from './components/Navbar';

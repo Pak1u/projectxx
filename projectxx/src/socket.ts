@@ -327,17 +327,89 @@ export function setupSocketIO(io: Server) {
       }
     });
 
+    // Handle user disconnection
     socket.on('disconnect', () => {
-      // console.log('User disconnected:', socket.id);
-      
-      // Remove user from connected users
+      // Find and remove the disconnected user
       for (const [email, user] of connectedUsers.entries()) {
         if (user.socketId === socket.id) {
           connectedUsers.delete(email);
-          // console.log(`User ${email} disconnected. Remaining users:`, connectedUsers.size);
+          // console.log(`User ${email} disconnected. Total connected users:`, connectedUsers.size);
           break;
         }
       }
     });
+
+    // Transit-related events
+    socket.on('joinTransitRoom', () => {
+      socket.join('transit');
+      console.log('User joined transit room');
+    });
+
+    socket.on('leaveTransitRoom', () => {
+      socket.leave('transit');
+      console.log('User left transit room');
+    });
+
+    // Marketplace-related events
+    socket.on('joinMarketplaceRoom', () => {
+      socket.join('marketplace');
+      console.log('User joined marketplace room, socket ID:', socket.id);
+    });
+
+    socket.on('leaveMarketplaceRoom', () => {
+      socket.leave('marketplace');
+      console.log('User left marketplace room, socket ID:', socket.id);
+    });
   });
+}
+
+// Transit event emitters
+export function emitOfferAccepted(io: Server, itemRequest: any) {
+  io.to('transit').emit('offerAccepted', {
+    type: 'OFFER_ACCEPTED',
+    itemRequest: {
+      id: itemRequest.id,
+      itemName: itemRequest.itemName,
+      quantity: itemRequest.quantity,
+      status: itemRequest.status,
+      warehouse: itemRequest.warehouse,
+      employee: itemRequest.employee,
+      offers: itemRequest.offers,
+      acceptanceTime: itemRequest.acceptanceTime
+    }
+  });
+  console.log('Emitted offerAccepted event for request:', itemRequest.id);
+}
+
+export function emitTransitComplete(io: Server, itemRequestId: string) {
+  io.to('transit').emit('transitComplete', {
+    type: 'TRANSIT_COMPLETE',
+    itemRequestId: itemRequestId
+  });
+  console.log('Emitted transitComplete event for request:', itemRequestId);
+}
+
+export function emitOfferCreated(io: Server, offer: any, itemRequest: any) {
+  const eventData = {
+    type: 'OFFER_CREATED',
+    offer: {
+      id: offer.id,
+      quantity: offer.quantity,
+      price: offer.price,
+      status: offer.status,
+      vendor: offer.vendor
+    },
+    itemRequest: {
+      id: itemRequest.id,
+      itemName: itemRequest.itemName,
+      quantity: itemRequest.quantity,
+      status: itemRequest.status,
+      warehouse: itemRequest.warehouse,
+      employee: itemRequest.employee
+    }
+  };
+  
+  console.log('Emitting offerCreated event to marketplace room:', eventData);
+  io.to('marketplace').emit('offerCreated', eventData);
+  console.log('Emitted offerCreated event for offer:', offer.id);
 } 

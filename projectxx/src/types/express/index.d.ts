@@ -1,1 +1,10 @@
-// Extend Express Request type here if needed in the future 
+import { Request } from 'express';
+
+declare module 'express' {
+  export interface Request {
+    user?: {
+      userId: string;
+      role: 'EMPLOYEE' | 'VENDOR' | 'ADMIN';
+    };
+  }
+} 
