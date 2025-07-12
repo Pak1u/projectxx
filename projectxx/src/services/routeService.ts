@@ -33,7 +33,7 @@ export function calculateStraightLineDistance(point1: Coordinates, point2: Coord
 }
 
 // Call OpenRouteService API to get actual route data
-async function callOpenRouteServiceAPI(start: Coordinates, end: Coordinates): Promise<RouteData> {
+export async function callOpenRouteServiceAPI(start: Coordinates, end: Coordinates): Promise<RouteData> {
   console.log(`🌐 [RouteService] Calling OpenRouteService API...`);
   console.log(`📍 [RouteService] Start coordinates: ${start.lat}, ${start.lng}`);
   console.log(`🏢 [RouteService] End coordinates: ${end.lat}, ${end.lng}`);

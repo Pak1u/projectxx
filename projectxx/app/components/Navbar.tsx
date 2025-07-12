@@ -168,6 +168,14 @@ export default function Navbar() {
                     Warehouse
                   </Link>
                 )}
+                {user && user.role === 'EMPLOYEE' && user.employee?.warehouseId && (
+                  <Link 
+                    href="/employee/route-planner" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Route Planner
+                  </Link>
+                )}
                 <Link 
                   href={user.role === 'VENDOR' ? '/vendor/dashboard' : '/employee/dashboard'} 
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"

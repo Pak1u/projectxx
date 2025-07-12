@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom map marker styles */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-marker div {
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-marker:hover div {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Map container styles */
+.leaflet-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Route line hover effects */
+.leaflet-interactive:hover {
+  stroke-width: 6 !important;
+  opacity: 1 !important;
+} 

@@ -30,6 +30,9 @@ import billingRouter from './routes/api/billing/index';
 import employeeOrdersRouter from './routes/api/employee/orders';
 import messagesRouter from './routes/api/messages';
 import warehouseRouter from './routes/api/warehouse';
+import routeCoordinatesRouter from './routes/api/route-coordinates';
+import shortestRouteRouter from './routes/api/shortest-route';
+import orsDistanceRouter from './routes/api/ors-distance';
 
 app.use('/api/auth', authRouter);
 app.use('/api/protected', protectedRouter);
@@ -41,6 +44,9 @@ app.use('/api/billing', billingRouter);
 app.use('/api/employee/orders', employeeOrdersRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/warehouse', warehouseRouter(io));
+app.use('/api/route-coordinates', routeCoordinatesRouter);
+app.use('/api/shortest-route', shortestRouteRouter);
+app.use('/api/ors-distance', orsDistanceRouter);
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {

@@ -1,4 +1,6 @@
 {
-  "/employee/warehouse/page": "app/employee/warehouse/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/employee/route-planner/page": "app/employee/route-planner/page.js",
+  "/login/page": "app/login/page.js",
+  "/employee/dashboard/page": "app/employee/dashboard/page.js"
 }
