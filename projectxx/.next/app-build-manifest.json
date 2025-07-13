@@ -1,15 +1,51 @@
 {
   "pages": {
-    "/employee/assign-trucks/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/employee/assign-trucks/page.js"
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
+    ],
+    "/marketplace/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/marketplace/page.js"
+    ],
+    "/employee/assign-trucks/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/employee/assign-trucks/page.js"
+    ],
+    "/employee/route-planner/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/employee/route-planner/page.css",
+      "static/chunks/app/employee/route-planner/page.js"
+    ],
+    "/employee/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/employee/profile/page.js"
+    ],
+    "/transit/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/transit/page.js"
+    ],
+    "/messages/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/messages/page.js"
+    ],
+    "/employee/billing/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/employee/billing/page.js"
     ],
     "/employee/warehouse/page": [
       "static/chunks/webpack.js",

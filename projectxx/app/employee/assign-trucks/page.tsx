@@ -269,6 +269,12 @@ export default function AssignTrucks() {
         const result = await response.json();
         setTruckResults(result.trucks);
         await updateBackendInventory();
+        // Store truck assignments in localStorage and redirect to route planner
+        localStorage.setItem('assignedTrucks', JSON.stringify(result.trucks));
+        // Store itemId to itemName mapping
+        const itemIdNameMap = Object.fromEntries(warehouseInventory.map(item => [item.id, item.name]));
+        localStorage.setItem('itemIdNameMap', JSON.stringify(itemIdNameMap));
+        window.location.href = '/employee/route-planner';
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Failed to assign trucks');

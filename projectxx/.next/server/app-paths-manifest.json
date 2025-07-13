@@ -1,4 +1,11 @@
 {
+  "/page": "app/page.js",
+  "/employee/assign-trucks/page": "app/employee/assign-trucks/page.js",
+  "/marketplace/page": "app/marketplace/page.js",
+  "/employee/route-planner/page": "app/employee/route-planner/page.js",
+  "/employee/profile/page": "app/employee/profile/page.js",
+  "/transit/page": "app/transit/page.js",
+  "/employee/billing/page": "app/employee/billing/page.js",
   "/employee/warehouse/page": "app/employee/warehouse/page.js",
-  "/employee/assign-trucks/page": "app/employee/assign-trucks/page.js"
+  "/messages/page": "app/messages/page.js"
 }
