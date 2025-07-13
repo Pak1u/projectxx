@@ -245,7 +245,7 @@ export default function Marketplace() {
           });
           if (res.ok) {
             const data = await res.json();
-            const distancesMap = {};
+            const distancesMap: Record<string, any> = {};
             data.distances.forEach((item: any) => {
               distancesMap[item.warehouseId] = item;
             });
