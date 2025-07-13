@@ -33,6 +33,10 @@ import warehouseRouter from './routes/api/warehouse';
 import routeCoordinatesRouter from './routes/api/route-coordinates';
 import shortestRouteRouter from './routes/api/shortest-route';
 import orsDistanceRouter from './routes/api/ors-distance';
+import assignTrucksRouter from './routes/api/employee/assign-trucks';
+import vendorsRouter from './routes/api/vendors';
+import warehouseInventoryRouter from './routes/api/employee/warehouse/inventory';
+import updateInventoryRouter from './routes/api/employee/warehouse/update-inventory';
 
 app.use('/api/auth', authRouter);
 app.use('/api/protected', protectedRouter);
@@ -47,6 +51,10 @@ app.use('/api/warehouse', warehouseRouter(io));
 app.use('/api/route-coordinates', routeCoordinatesRouter);
 app.use('/api/shortest-route', shortestRouteRouter);
 app.use('/api/ors-distance', orsDistanceRouter);
+app.use('/api/employee/assign-trucks', assignTrucksRouter);
+app.use('/api/vendors', vendorsRouter);
+app.use('/api/employee/warehouse/inventory', warehouseInventoryRouter);
+app.use('/api/employee/warehouse/update-inventory', updateInventoryRouter);
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {

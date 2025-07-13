@@ -176,6 +176,14 @@ export default function Navbar() {
                     Route Planner
                   </Link>
                 )}
+                {user && user.role === 'EMPLOYEE' && user.employee?.warehouseId && (
+                  <Link 
+                    href="/employee/assign-trucks" 
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Assign Trucks
+                  </Link>
+                )}
                 <Link 
                   href={user.role === 'VENDOR' ? '/vendor/dashboard' : '/employee/dashboard'} 
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"

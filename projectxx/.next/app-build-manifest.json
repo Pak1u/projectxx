@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/page": [
+    "/employee/assign-trucks/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/employee/assign-trucks/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -11,21 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/employee/route-planner/page": [
+    "/employee/warehouse/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/employee/route-planner/page.css",
-      "static/chunks/app/employee/route-planner/page.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
-    ],
-    "/employee/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/employee/dashboard/page.js"
+      "static/chunks/app/employee/warehouse/page.js"
     ]
   }
 }

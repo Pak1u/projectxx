@@ -60,6 +60,12 @@ export default function EmployeeDashboard() {
               >
                 View Profile
               </a>
+              <a 
+                href="/employee/assign-trucks" 
+                className="block bg-teal-600 text-white px-4 py-3 rounded hover:bg-teal-700 text-center transition-colors"
+              >
+                Assign Trucks
+              </a>
             </div>
           </div>
         </div>
