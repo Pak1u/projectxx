@@ -106,28 +106,59 @@ export default function Navbar() {
         <div className="flex-1 flex items-center justify-center space-x-2">
           {user ? (
             <>
-              {/* Essential Navigation */}
-              <Link 
-                href="/messages" 
-                className={`relative group px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${
-                  isActive('/messages') 
-                    ? 'text-blue-600 bg-blue-50 border border-blue-200 shadow-sm' 
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <span>Messages</span>
-                {hasUnreadMessages && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-3 w-3 flex items-center justify-center animate-pulse"></span>
-                )}
-              </Link>
-
-              {/* In the Navbar, conditionally render the Marketplace, Transit, and More tabs only if the user is not an admin.
-                  If the user is an admin, do not render these tabs. */}
-              {user.role !== 'ADMIN' && (
+              {user.role === 'ADMIN' ? (
                 <>
+                  <Link 
+                    href="/admin/dashboard" 
+                    className={`group px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${
+                      isActive('/admin/dashboard') 
+                        ? 'text-blue-600 bg-blue-50 border border-blue-200 shadow-sm' 
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
+                    </svg>
+                    <span>Dashboard</span>
+                  </Link>
+                  <Link 
+                    href="/messages" 
+                    className={`relative group px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${
+                      isActive('/messages') 
+                        ? 'text-blue-600 bg-blue-50 border border-blue-200 shadow-sm' 
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <span>Messages</span>
+                    {hasUnreadMessages && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-3 w-3 flex items-center justify-center animate-pulse"></span>
+                    )}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  {/* Essential Navigation */}
+                  <Link 
+                    href="/messages" 
+                    className={`relative group px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${
+                      isActive('/messages') 
+                        ? 'text-blue-600 bg-blue-50 border border-blue-200 shadow-sm' 
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <span>Messages</span>
+                    {hasUnreadMessages && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-3 w-3 flex items-center justify-center animate-pulse"></span>
+                    )}
+                  </Link>
+
                   <Link 
                     href="/marketplace" 
                     className={`group px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${
@@ -284,25 +315,23 @@ export default function Navbar() {
                             </Link>
                           </>
                         )}
+
+                        {/* Friends link for all users */}
+                        <Link 
+                          href="/friends" 
+                          className={`flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${
+                            isActive('/friends') ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+                          }`}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                          </svg>
+                          <span>Friends</span>
+                        </Link>
                       </div>
                     </div>
                   </div>
                 </>
-              )}
-              {user.role === 'ADMIN' && (
-                <Link 
-                  href="/admin/dashboard" 
-                  className={`group px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${
-                    isActive('/admin/dashboard') 
-                      ? 'text-purple-600 bg-purple-50 border border-purple-200 shadow-sm' 
-                      : 'text-gray-700 hover:text-purple-600 hover:bg-purple-50'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <span>Dashboard</span>
-                </Link>
               )}
             </>
           ) : null}
@@ -313,9 +342,9 @@ export default function Navbar() {
           {user ? (
             <div className="flex items-stretch h-12">
               <Link 
-                href={user.role === 'EMPLOYEE' ? '/employee/profile' : '/vendor/profile'}
+                href={user.role === 'ADMIN' ? '/admin/profile' : user.role === 'EMPLOYEE' ? '/employee/profile' : '/vendor/profile'}
                 className={`flex items-center space-x-3 px-4 h-full rounded-l-lg border-l border-y transition-all duration-300 group ${
-                  isActive('/employee/profile') || isActive('/vendor/profile')
+                  isActive('/admin/profile') || isActive('/employee/profile') || isActive('/vendor/profile')
                     ? 'bg-gradient-to-r from-blue-100 to-green-100 border-blue-300 shadow-sm'
                     : 'bg-gradient-to-r from-blue-50 to-green-50 border-blue-200 hover:from-blue-100 hover:to-green-100'
                 }`}

@@ -378,6 +378,14 @@ export default function MarketplacePage() {
             </div>
           </div>
           <div className="p-8 space-y-8">
+            {/* Create Request Button for Employees */}
+            {user?.role === 'EMPLOYEE' && (
+              <div className="mb-6">
+                <Link href="/employee/request" className="block w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-3 rounded-lg font-semibold text-center shadow hover:from-blue-700 hover:to-green-600 transition">
+                  + Create Request
+                </Link>
+              </div>
+            )}
             {/* Place your marketplace content/components here, e.g. item list, request form, etc. */}
             {/* Example placeholder: */}
             <div className="bg-gray-50 rounded-lg p-4 mb-6">

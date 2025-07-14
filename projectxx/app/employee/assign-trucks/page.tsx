@@ -342,18 +342,17 @@ export default function AssignTrucks() {
             </div>
           </div>
           <div className="p-8 space-y-8">
-            {/* Truck Volume Input */}
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h2 className="text-lg font-semibold mb-4">Truck Volume (cubic feet)</h2>
+            {/* Truck Volume Input - Always visible and clear */}
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-6 mb-6">
+              <label htmlFor="truck-volume" className="block text-sm font-medium text-gray-700 mb-2 md:mb-0 md:w-48">Truck Volume Capacity</label>
               <input
+                id="truck-volume"
                 type="number"
                 value={truckVolume}
                 onChange={(e) => setTruckVolume(Number(e.target.value))}
-                min="100"
-                max="5000"
-                step="100"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter truck volume"
+                className="w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter truck volume (default: 1000)"
+                min={1}
               />
             </div>
             {/* Inventory/Vendor Assignment Controls */}

@@ -67,52 +67,41 @@ export default function EmployeeWarehousePage() {
 
   return (
     <ProtectedRoute requiredRole="EMPLOYEE">
-      <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-green-50 to-white flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+      <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-green-50 to-white flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
         {/* Decorative background shapes */}
         <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full opacity-30 blur-2xl -z-10" style={{top: '-4rem', left: '-4rem'}} />
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-100 rounded-full opacity-30 blur-2xl -z-10" style={{bottom: '-4rem', right: '-4rem'}} />
-        <h2 className="text-3xl font-extrabold mb-8 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg tracking-tight">Warehouse Inventory</h2>
+        <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg">Warehouse Inventory</h2>
         {loading ? (
-          <div className="flex items-center justify-center min-h-[200px]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
-            <span className="text-blue-700 text-lg">Loading warehouse inventory...</span>
-          </div>
+          <p>Loading warehouse inventory...</p>
         ) : error ? (
-          <p className="text-red-500 text-lg font-semibold">{error}</p>
+          <p className="text-red-500">{error}</p>
         ) : warehouseInventory.length === 0 ? (
-          <p className="text-gray-600 text-lg">No inventory items found in warehouse.</p>
+          <p>No inventory items found in warehouse.</p>
         ) : (
-          <div className="w-full max-w-5xl">
-            <div className="bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl p-0 overflow-hidden animate-fade-in-up border border-blue-100">
-              <div className="flex items-center bg-gradient-to-r from-blue-600 to-green-500 p-8">
-                <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-xl mr-6">
-                  <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10l9-7 9 7v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8z" /></svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-1">Warehouse Stock</h3>
-                  <p className="text-blue-100">View and monitor your warehouse inventory and minimum requirements.</p>
-                </div>
+          <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-0 overflow-hidden animate-fade-in-up">
+            <div className="flex items-center bg-gradient-to-r from-blue-600 to-teal-500 p-6 rounded-t-2xl">
+              <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg mr-4">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
               </div>
-              <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-1">Warehouse Stock</h3>
+                <p className="text-blue-100">Current inventory and minimum predictions</p>
+              </div>
+            </div>
+            <div className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {warehouseInventory.map((item: any) => {
-                  const minQty = minPredictions[item.itemName?.toLowerCase()];
+                  const minQty = minPredictions[item.itemName.toLowerCase()];
                   const isBelowMin = minQty !== undefined && item.quantity < minQty;
                   const minColor = minQty === undefined ? 'text-gray-500' : isBelowMin ? 'text-red-600' : 'text-green-600';
-                  const cardBorder = isBelowMin ? 'border-red-300' : 'border-green-200';
                   return (
-                    <div key={item.id} className={`bg-white/90 rounded-2xl shadow-xl border-2 ${cardBorder} p-6 flex flex-col items-start gap-3 hover:shadow-2xl transition-all`}>
-                      <div className="flex items-center gap-3 mb-2">
-                        <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                        <span className="font-semibold text-lg text-blue-900">{item.itemName}</span>
+                    <div key={item.id} className="border rounded-xl p-6 bg-gray-50 hover:shadow-lg transition-shadow flex flex-col items-start">
+                      <div className="font-semibold text-lg mb-2 text-blue-900">{item.itemName}</div>
+                      <div className="text-gray-700 mb-1">Quantity: <span className="font-bold text-blue-700">{item.quantity}</span></div>
+                      <div className={minColor + " font-medium"}>
+                        Minimum Needed: {minQty !== undefined ? minQty : 'Loading...'}
                       </div>
-                      <div className="text-gray-700 text-base">Quantity: <span className="font-bold text-blue-700">{item.quantity}</span></div>
-                      <div className={`text-base font-medium ${minColor}`}>Minimum Needed: {minQty !== undefined ? minQty : 'Loading...'}</div>
-                      {minQty !== undefined && isBelowMin && (
-                        <div className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-1.414 1.414M6.343 17.657l-1.414 1.414M5.636 5.636l1.414 1.414M17.657 17.657l1.414 1.414M12 8v4m0 4h.01" /></svg>
-                          Below minimum required!
-                        </div>
-                      )}
                     </div>
                   );
                 })}

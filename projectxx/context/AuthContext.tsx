@@ -153,6 +153,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('role', data.role);
       localStorage.setItem('email', data.email);
       localStorage.setItem('name', data.name);
+      let userObj: User = { email: data.email, name: data.name, role: data.role };
+      if (data.role === 'EMPLOYEE') {
+        // Fetch employee profile after registration
+        const profileRes = await fetch(`${API_BASE}/api/employee/profile`, {
+          headers: { 'Authorization': `Bearer ${data.token}` },
+        });
+        if (profileRes.ok) {
+          const employee = await profileRes.json();
+          userObj.employee = employee;
+          // If employee profile has a name, use it
+          if (employee.name) {
+            userObj.name = employee.name;
+            localStorage.setItem('name', employee.name);
+          }
+          localStorage.setItem('employee', JSON.stringify(employee));
+        }
+      } else {
+        localStorage.removeItem('employee');
+      }
+      // Store user object with employee if present
+      localStorage.setItem('user', JSON.stringify(userObj));
       return true;
     } catch {
       return false;
