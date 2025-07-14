@@ -180,7 +180,7 @@ function OfferModal({ open, onClose, onSubmit, maxQuantity, loading, error, avai
   );
 }
 
-export default function Marketplace() {
+export default function MarketplacePage() {
   const [itemRequests, setItemRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -361,75 +361,89 @@ export default function Marketplace() {
 
   return (
     <ProtectedRoute requiredRole={user?.role === 'VENDOR' ? 'VENDOR' : 'EMPLOYEE'}>
-      <div className="flex flex-col items-center justify-center min-h-[60vh] w-full px-4">
-        <h2 className="text-3xl font-semibold mb-6">Marketplace</h2>
-        {user?.role === 'EMPLOYEE' && (
-          <div className="mb-6 w-full max-w-4xl flex justify-end">
-            <Link
-              href="/employee/request"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              + Add Request
-            </Link>
+      <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-green-50 to-white flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+        {/* Decorative background shapes */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full opacity-30 blur-2xl -z-10" style={{top: '-4rem', left: '-4rem'}} />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-100 rounded-full opacity-30 blur-2xl -z-10" style={{bottom: '-4rem', right: '-4rem'}} />
+        <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg">Marketplace</h2>
+        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl p-0 overflow-hidden animate-fade-in-up">
+          {/* Unified Gradient Header */}
+          <div className="flex items-center bg-gradient-to-r from-blue-600 to-teal-500 p-6">
+            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg mr-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-1">Browse & Request Inventory</h3>
+              <p className="text-blue-100">Explore available items, request inventory, and connect with vendors.</p>
+            </div>
           </div>
-        )}
-        {loading ? (
-          <p>Loading item requests...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : itemRequests.length === 0 ? (
-          <p>No active item requests found.</p>
-        ) : (
-          <div className="w-full max-w-4xl space-y-6">
-            {itemRequests.map((req: any) => (
-              <div key={req.id} className="border rounded-lg p-4 shadow bg-white">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-                  <div>
-                    <div className="font-bold text-lg">{req.itemName} (x{req.quantity})</div>
-                    <div className="text-gray-600 text-sm">Warehouse: {req.warehouse?.name}</div>
-                    <div className="text-gray-600 text-sm">Requested by: {req.employee?.name}</div>
-                    {user?.role === 'VENDOR' && req.warehouse?.id && (
-                      <DistanceDisplay warehouseId={req.warehouse.id} vendorDistances={vendorDistances} />
-                    )}
-                  </div>
-                  <div className="mt-2 md:mt-0 flex flex-col items-end gap-2">
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded mb-1">Status: {req.status || 'PENDING'}</span>
-                    {user?.role === 'VENDOR' && (
-                      <button
-                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
-                        onClick={() => handleOpenModal(req)}
-                      >
-                        Make Offer
-                      </button>
-                    )}
-                  </div>
-                </div>
-                {req.offers && req.offers.length > 0 && (
-                  <div className="mt-3">
-                    <div className="font-semibold text-sm mb-1">Offers:</div>
-                    <ul className="text-sm list-disc list-inside">
-                      {req.offers.map((offer: any) => (
-                        <li key={offer.id}>
-                          Vendor: {offer.vendor?.name || 'Unknown'} | Qty: {offer.quantity} | Status: {offer.status}
-                          {offer.vendor?.id && req.warehouse?.id && (
-                            <RouteInfo vendorId={offer.vendor.id} warehouseId={req.warehouse.id} />
+          <div className="p-8 space-y-8">
+            {/* Place your marketplace content/components here, e.g. item list, request form, etc. */}
+            {/* Example placeholder: */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <h2 className="text-lg font-semibold mb-4">Available Items</h2>
+              {/* Render your marketplace items here, keeping the original logic */}
+              {loading ? (
+                <p>Loading item requests...</p>
+              ) : error ? (
+                <p className="text-red-500">{error}</p>
+              ) : itemRequests.length === 0 ? (
+                <p>No active item requests found.</p>
+              ) : (
+                <div className="w-full max-w-4xl space-y-6">
+                  {itemRequests.map((req: any) => (
+                    <div key={req.id} className="border rounded-lg p-4 shadow bg-white">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+                        <div>
+                          <div className="font-bold text-lg">{req.itemName} (x{req.quantity})</div>
+                          <div className="text-gray-600 text-sm">Warehouse: {req.warehouse?.name}</div>
+                          <div className="text-gray-600 text-sm">Requested by: {req.employee?.name}</div>
+                          {user?.role === 'VENDOR' && req.warehouse?.id && (
+                            <DistanceDisplay warehouseId={req.warehouse.id} vendorDistances={vendorDistances} />
                           )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {user?.role === 'EMPLOYEE' && (
-                  <div className="mt-3">
-                    <Link href={`/marketplace/request/${req.id}`} className="text-blue-600 hover:text-blue-800 text-sm">
-                      View Details →
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ))}
+                        </div>
+                        <div className="mt-2 md:mt-0 flex flex-col items-end gap-2">
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded mb-1">Status: {req.status || 'PENDING'}</span>
+                          {user?.role === 'VENDOR' && (
+                            <button
+                              className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
+                              onClick={() => handleOpenModal(req)}
+                            >
+                              Make Offer
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {req.offers && req.offers.length > 0 && (
+                        <div className="mt-3">
+                          <div className="font-semibold text-sm mb-1">Offers:</div>
+                          <ul className="text-sm list-disc list-inside">
+                            {req.offers.map((offer: any) => (
+                              <li key={offer.id}>
+                                Vendor: {offer.vendor?.name || 'Unknown'} | Qty: {offer.quantity} | Status: {offer.status}
+                                {offer.vendor?.id && req.warehouse?.id && (
+                                  <RouteInfo vendorId={offer.vendor.id} warehouseId={req.warehouse.id} />
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {user?.role === 'EMPLOYEE' && (
+                        <div className="mt-3">
+                          <Link href={`/marketplace/request/${req.id}`} className="text-blue-600 hover:text-blue-800 text-sm">
+                            View Details →
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Add more sections/cards as needed, following the same UI style */}
           </div>
-        )}
+        </div>
         <OfferModal
           open={modalOpen}
           onClose={handleCloseModal}

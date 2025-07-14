@@ -325,22 +325,38 @@ export default function AssignTrucks() {
 
   return (
     <ProtectedRoute requiredRole="EMPLOYEE">
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Assign Trucks</h1>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Truck Volume Capacity
-              </label>
+      <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-green-50 to-white flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+        {/* Decorative background shapes */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full opacity-30 blur-2xl -z-10" style={{top: '-4rem', left: '-4rem'}} />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-100 rounded-full opacity-30 blur-2xl -z-10" style={{bottom: '-4rem', right: '-4rem'}} />
+        <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg">Assign Trucks</h2>
+        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl p-0 overflow-hidden animate-fade-in-up">
+          {/* Unified Gradient Header */}
+          <div className="flex items-center bg-gradient-to-r from-blue-600 to-teal-500 p-6">
+            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg mr-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-1">Assign Trucks & Manage Deliveries</h3>
+              <p className="text-blue-100">Select items, assign to vendors, and view truck assignments in one place.</p>
+            </div>
+          </div>
+          <div className="p-8 space-y-8">
+            {/* Truck Volume Input */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <h2 className="text-lg font-semibold mb-4">Truck Volume (cubic feet)</h2>
               <input
                 type="number"
                 value={truckVolume}
                 onChange={(e) => setTruckVolume(Number(e.target.value))}
-                className="w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="100"
+                max="5000"
+                step="100"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter truck volume"
               />
             </div>
+            {/* Inventory/Vendor Assignment Controls */}
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <h2 className="text-lg font-semibold mb-4">Add Items to Vendors</h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -362,7 +378,7 @@ export default function AssignTrucks() {
                   className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select Item</option>
-                  {availableItems.map(item => {
+                  {getAvailableItems().map(item => {
                     const isAssignedToVendor = vendorAssignments
                       .find(v => v.vendorId === selectedVendorId)
                       ?.items.some(i => i.itemId === item.id);
@@ -399,6 +415,7 @@ export default function AssignTrucks() {
                 {error}
               </div>
             )}
+            {/* Vendor Assignments List */}
             <div className="space-y-6">
               {vendorAssignments
                 .filter(assignment => assignment.items.length > 0)
@@ -427,6 +444,7 @@ export default function AssignTrucks() {
                   </div>
                 ))}
             </div>
+            {/* Assign Trucks Button */}
             <div className="mt-6">
               <button
                 onClick={assignTrucks}
@@ -436,37 +454,36 @@ export default function AssignTrucks() {
                 {isLoading ? 'Assigning Trucks...' : 'Assign Trucks'}
               </button>
             </div>
-          </div>
-          {truckResults.length > 0 && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Truck Assignment Results</h2>
-              <div className="space-y-4">
-                {truckResults.map((truck, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      Truck {truck.truckNumber}
-                    </h3>
-                    <div className="mb-2">
-                      <span className="font-medium">Destinations: </span>
-                      {truck.destinations.map((dest, i) => (
-                        <span key={i} className="text-blue-600">
-                          {dest}{i < truck.destinations.length - 1 ? ', ' : ''}
-                        </span>
-                      ))}
+            {/* Truck Assignment Results */}
+            {truckResults.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold mb-4 text-blue-800">Truck Assignment Results</h2>
+                <div className="space-y-4">
+                  {truckResults.map((truck, index) => (
+                    <div key={index} className="border rounded-lg p-4 bg-blue-50">
+                      <h3 className="text-lg font-semibold mb-2 text-blue-700">Truck {truck.truckNumber}</h3>
+                      <div className="mb-2">
+                        <span className="font-medium">Destinations: </span>
+                        {truck.destinations.map((dest, i) => (
+                          <span key={i} className="text-blue-600">
+                            {dest}{i < truck.destinations.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mb-2">
+                        <span className="font-medium">Items: </span>
+                        {truck.items.map((item, i) => (
+                          <span key={i} className="text-green-600">
+                            Item {item.itemId} (qty: {item.quantity}){i < truck.items.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium">Items: </span>
-                      {truck.items.map((item, i) => (
-                        <span key={i} className="text-green-600">
-                          Item {item.itemId} (qty: {item.quantity}){i < truck.items.length - 1 ? ', ' : ''}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </ProtectedRoute>

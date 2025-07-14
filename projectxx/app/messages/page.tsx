@@ -70,23 +70,18 @@ export default function MessagesPage() {
     });
 
     newSocket.on('availableUsers', (usersList: User[]) => {
-      // console.log('Received users:', usersList);
       // Filter out current user
       const filteredUsers = usersList.filter(u => u.email !== user.email);
       setUsers(filteredUsers);
       
       // Calculate total unread count
       const total = filteredUsers.reduce((sum, u) => sum + u.unreadCount, 0);
-      // console.log('Total unread count:', total);
-      // console.log('Users with unread messages:', filteredUsers.filter(u => u.unreadCount > 0).map(u => `${u.name} (${u.unreadCount})`));
       setTotalUnreadCount(total);
       
       // Check for pending chat parameter and pre-select user
       if (pendingChatParam.current && !selectedUser) {
         const targetUser = filteredUsers.find(u => u.email === pendingChatParam.current);
         if (targetUser) {
-          console.log('Auto-selecting user from URL parameter:', targetUser.email);
-          // Add a small delay to ensure socket is ready
           setTimeout(() => {
             handleUserSelect(targetUser);
             pendingChatParam.current = null; // Clear the pending parameter
@@ -96,20 +91,12 @@ export default function MessagesPage() {
     });
 
     newSocket.on('privateMessage', (message: Message) => {
-      // console.log('Received private message:', message);
-      
-      // Add message to chat if it's specifically between current user and selected user
       const currentSelectedUser = selectedUserRef.current;
       if (currentSelectedUser && 
           ((message.senderEmail === user.email && message.receiverEmail === currentSelectedUser.email) ||
            (message.senderEmail === currentSelectedUser.email && message.receiverEmail === user.email))) {
-        // console.log('Adding message to chat:', message.content, 'between', user.email, 'and', currentSelectedUser.email);
         setMessages(prev => [...prev, message]);
-      } else {
-        // console.log('Ignoring message:', message.content, 'not between', user.email, 'and', currentSelectedUser?.email);
       }
-      
-      // Update unread count for the sender
       setUsers(prev => {
         const updatedUsers = prev.map(u => {
           if (u.email === message.senderEmail && message.receiverEmail === user.email) {
@@ -117,8 +104,6 @@ export default function MessagesPage() {
           }
           return u;
         });
-        
-        // Recalculate total unread count
         const total = updatedUsers.reduce((sum, u) => sum + u.unreadCount, 0);
         setTotalUnreadCount(total);
         return updatedUsers;
@@ -126,16 +111,12 @@ export default function MessagesPage() {
     });
 
     newSocket.on('messagesRead', (data: { senderEmail: string }) => {
-      // console.log('Messages read from:', data.senderEmail);
-      // Update unread count when messages are read
       setUsers(prev => prev.map(u => {
         if (u.email === data.senderEmail) {
           return { ...u, unreadCount: 0 };
         }
         return u;
       }));
-      
-      // Recalculate total unread count
       setUsers(prev => {
         const updatedUsers = prev.map(u => {
           if (u.email === data.senderEmail) {
@@ -150,7 +131,6 @@ export default function MessagesPage() {
     });
 
     newSocket.on('conversationHistory', (history: Message[]) => {
-      // console.log('Received conversation history:', history);
       setMessages(history);
     });
 
@@ -159,15 +139,10 @@ export default function MessagesPage() {
     };
   }, [user]);
 
-  // Removed duplicate getAvailableUsers call since it's now called in the connect event
-
-  // Retry auto-selection if users are loaded but we still have a pending chat parameter
   useEffect(() => {
     if (users.length > 0 && pendingChatParam.current && !selectedUser && socket) {
       const targetUser = users.find(u => u.email === pendingChatParam.current);
       if (targetUser) {
-        console.log('Retrying auto-selection for user:', targetUser.email);
-        // Add a small delay to ensure everything is ready
         setTimeout(() => {
           handleUserSelect(targetUser);
           pendingChatParam.current = null;
@@ -185,11 +160,8 @@ export default function MessagesPage() {
   };
 
   const handleUserSelect = (selectedUser: User) => {
-    console.log('handleUserSelect called for:', selectedUser.email);
     setSelectedUser(selectedUser);
     setMessages([]);
-    
-    // Remove blue dot from the selected user immediately
     setUsers(prev => {
       const updatedUsers = prev.map(u => {
         if (u.email === selectedUser.email) {
@@ -197,40 +169,29 @@ export default function MessagesPage() {
         }
         return u;
       });
-      
-      // Recalculate total unread count
       const total = updatedUsers.reduce((sum, u) => sum + u.unreadCount, 0);
       setTotalUnreadCount(total);
       return updatedUsers;
     });
-    
     if (socket && user) {
-      console.log('Joining private room and getting conversation history for:', selectedUser.email);
-      // Join private room and mark messages as read
       socket.emit('joinPrivateRoom', { 
         senderEmail: user.email, 
         receiverEmail: selectedUser.email 
       });
-      
-      // Get conversation history
       socket.emit('getConversationHistory', {
         user1Email: user.email,
         user2Email: selectedUser.email
       });
-    } else {
-      console.log('Socket or user not ready. Socket:', !!socket, 'User:', !!user);
     }
   };
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser || !socket || !user) return;
-
     const messageData = {
       senderEmail: user.email,
       receiverEmail: selectedUser.email,
       content: newMessage
     };
-
     socket.emit('sendPrivateMessage', messageData);
     setNewMessage('');
   };
@@ -243,96 +204,106 @@ export default function MessagesPage() {
   };
 
   if (!user) {
-    return <div className="flex justify-center items-center h-screen">Please log in to access messages.</div>;
+    return <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-white">Please log in to access messages.</div>;
   }
 
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Messages</h2>
-          {totalUnreadCount > 0 && (
-            <div className="mt-2">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {totalUnreadCount} unread
-              </span>
-            </div>
-          )}
-        </div>
-        
-        <div className="flex-1 overflow-y-auto">
-          {users.map((userItem) => (
-            <div
-              key={userItem.id}
-              onClick={() => handleUserSelect(userItem)}
-              className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                selectedUser?.email === userItem.email ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <div className={`w-3 h-3 rounded-full ${
-                      userItem.online ? 'bg-green-500' : 'bg-gray-300'
-                    }`}></div>
-                    {userItem.unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">{userItem.name}</div>
-                    <div className="text-sm text-gray-500">{userItem.role}</div>
-                  </div>
-                </div>
-                {userItem.unreadCount > 0 && (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
-                      {userItem.unreadCount}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+  // Helper: Split users by role
+  const vendors = users.filter(u => u.role.toLowerCase() === 'vendor');
+  const employees = users.filter(u => u.role.toLowerCase().includes('employee'));
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+  return (
+    <div className="flex min-h-screen h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-neutral-100 relative overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-80 bg-white/80 border-r border-gray-200 flex flex-col shadow-2xl z-10 h-full backdrop-blur-md">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-2xl font-extrabold text-blue-900 tracking-wide mb-2">Chat</h2>
+        </div>
+        {/* Vendors Section (only if vendors exist) */}
+        {vendors.length > 0 && (
+          <div className="px-4 py-3 border-b border-gray-200">
+            <h3 className="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-2">Vendors</h3>
+            <ul className="space-y-2">
+              {vendors.map((vendor) => (
+                <li
+                  key={vendor.id}
+                  className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition
+                    ${selectedUser?.id === vendor.id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-blue-50'}
+                  `}
+                  onClick={() => handleUserSelect(vendor)}
+                >
+                  <span className="w-7 h-7 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-sm">
+                    {vendor.name.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="text-gray-800 font-medium">{vendor.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {employees.length > 0 && (
+          <div className="px-4 py-3 border-b border-gray-200">
+            <h3 className="text-xs font-semibold text-purple-700 uppercase tracking-wider mb-2">Employees</h3>
+            <ul className="space-y-2">
+              {employees.map((employee) => (
+                <li
+                  key={employee.id}
+                  className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition
+                    ${selectedUser?.id === employee.id ? 'bg-purple-100 border-l-4 border-purple-500' : 'hover:bg-purple-50'}
+                  `}
+                  onClick={() => handleUserSelect(employee)}
+                >
+                  <span className="w-7 h-7 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-bold text-sm">
+                    {employee.name.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="text-gray-800 font-medium">{employee.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </aside>
+
+      {/* Main Chat Area */}
+      <main className="flex-1 flex flex-col h-full bg-gradient-to-br from-blue-50 via-purple-50 to-neutral-100 relative">
         {selectedUser ? (
           <>
-            {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 bg-white">
-              <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  selectedUser.online ? 'bg-green-500' : 'bg-gray-300'
-                }`}></div>
-                <div>
-                  <div className="font-semibold text-gray-900">{selectedUser.name}</div>
-                  <div className="text-sm text-gray-500">{selectedUser.role}</div>
+            {/* Stylish Chat Header */}
+            <header className="flex items-center gap-4 px-8 py-5 bg-white/80 border-b border-gray-200 shadow-md backdrop-blur-md sticky top-0 z-10 rounded-b-3xl">
+              <div className="relative">
+                {/* Profile Picture or Initials */}
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 via-purple-300 to-neutral-200 flex items-center justify-center text-2xl font-extrabold text-white shadow-lg">
+                  {selectedUser.name.charAt(0).toUpperCase()}
                 </div>
+                <span className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${
+                  selectedUser.online ? 'bg-green-500' : 'bg-gray-300'
+                }`}></span>
               </div>
-            </div>
+              <div>
+                <div className="font-bold text-blue-900 text-xl tracking-wide flex items-center gap-2">
+                  {selectedUser.name}
+                  <span className={`ml-2 text-xs font-semibold ${selectedUser.online ? 'text-green-600' : 'text-gray-400'}`}>{selectedUser.online ? 'Online' : 'Offline'}</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">{selectedUser.role}</div>
+              </div>
+            </header>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Messages Section with Elegant Background */}
+            <section className="flex-1 overflow-y-auto px-8 py-8 space-y-6 bg-gradient-to-br from-blue-50 via-purple-50 to-neutral-100" style={{backgroundImage: 'radial-gradient(circle at 80% 20%, rgba(180,180,255,0.08) 0, transparent 70%)'}}>
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.senderEmail === user.email ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${message.senderEmail === user.email ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    className={`max-w-lg px-6 py-3 rounded-3xl shadow-lg transition-all duration-200 text-base leading-relaxed ${
                       message.senderEmail === user.email
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-900'
+                        ? 'bg-gradient-to-br from-blue-500 via-blue-400 to-purple-400 text-white rounded-br-xl'
+                        : 'bg-white/80 text-gray-900 rounded-bl-xl border border-gray-100'
                     }`}
                   >
-                    <div className="text-sm">{message.content}</div>
-                    <div className={`text-xs mt-1 ${
-                      message.senderEmail === user.email ? 'text-blue-100' : 'text-gray-500'
+                    {message.content}
+                    <div className={`text-xs mt-2 text-right ${
+                      message.senderEmail === user.email ? 'text-blue-100' : 'text-gray-400'
                     }`}>
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </div>
@@ -340,28 +311,28 @@ export default function MessagesPage() {
                 </div>
               ))}
               <div ref={messagesEndRef} />
-            </div>
+            </section>
 
-            {/* Message Input */}
-            <div className="p-4 border-t border-gray-200 bg-white">
-              <div className="flex space-x-2">
+            {/* Chat Typing Input Area as Card */}
+            <footer className="px-8 py-6 bg-transparent flex-shrink-0">
+              <div className="flex items-end gap-3 bg-white/90 rounded-2xl shadow-xl px-6 py-4">
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="flex-1 border-none bg-transparent focus:outline-none text-base resize-none placeholder-gray-400"
                   rows={2}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!newMessage.trim()}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center px-5 py-2 bg-gradient-to-br from-blue-500 via-purple-500 to-blue-400 text-white rounded-xl shadow hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  Send
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </button>
               </div>
-            </div>
+            </footer>
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center">
@@ -372,7 +343,7 @@ export default function MessagesPage() {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 } 

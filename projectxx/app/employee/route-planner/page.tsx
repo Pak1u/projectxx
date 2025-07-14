@@ -30,7 +30,7 @@ interface RouteResult {
   error?: string;
 }
 
-export default function RoutePlannerPage() {
+export default function EmployeeRoutePlannerPage() {
   const [warehouse, setWarehouse] = useState<Coordinate | null>(null);
   const [stores, setStores] = useState<Coordinate[]>([]);
   const [matrix, setMatrix] = useState<number[][] | null>(null);
@@ -350,184 +350,207 @@ export default function RoutePlannerPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Route Planner: Your Warehouse & Stores</h1>
-      {/* Truck selector UI */}
-      {truckRoutes.length > 0 && (
-        <div className="flex gap-2 mb-4">
-          {truckRoutes.map((tr, idx) => (
-            <button
-              key={idx}
-              className={`px-4 py-2 rounded border font-bold ${selectedTruckIdx === idx ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-              onClick={() => setSelectedTruckIdx(idx)}
-            >
-              Truck {idx + 1}
-            </button>
-          ))}
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-green-50 to-white flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+      {/* Decorative background shapes */}
+      <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full opacity-30 blur-2xl -z-10" style={{top: '-4rem', left: '-4rem'}} />
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-100 rounded-full opacity-30 blur-2xl -z-10" style={{bottom: '-4rem', right: '-4rem'}} />
+      <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg">Route Planner</h2>
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl p-0 overflow-hidden animate-fade-in-up">
+        {/* Unified Gradient Header */}
+        <div className="flex items-center bg-gradient-to-r from-blue-600 to-teal-500 p-6">
+          <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg mr-4">
+            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-1">Plan & Visualize Delivery Routes</h3>
+            <p className="text-blue-100">Optimize and view your truck delivery routes on the map below.</p>
+          </div>
         </div>
-      )}
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column - Controls */}
-        <div>
-          {/* Employee Warehouse Info */}
-          {initializing ? (
-            <div className="mb-6 p-4 border rounded bg-blue-50">
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
-                <p className="text-blue-700">Loading your warehouse information...</p>
+        <div className="p-8 space-y-8">
+          {/* Place your route planner content/components here, e.g. map, route list, etc. */}
+          {/* Example placeholder: */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h2 className="text-lg font-semibold mb-4">Route Map & Assignments</h2>
+            {/* Render your map, route assignments, and controls here, keeping the original logic and all buttons */}
+            {/* Truck selector UI */}
+            {truckRoutes.length > 0 && (
+              <div className="flex gap-2 mb-4">
+                {truckRoutes.map((tr, idx) => (
+                  <button
+                    key={idx}
+                    className={`px-4 py-2 rounded border font-bold ${selectedTruckIdx === idx ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+                    onClick={() => setSelectedTruckIdx(idx)}
+                  >
+                    Truck {idx + 1}
+                  </button>
+                ))}
               </div>
-            </div>
-          ) : employeeWarehouse ? (
-            <div className="mb-6 p-4 border rounded bg-green-50">
-              <h2 className="font-semibold mb-4 text-green-800">Your Warehouse</h2>
-              <div className="mb-4">
-                <p className="text-green-700 font-medium">{employeeWarehouse.name}</p>
-                <p className="text-sm text-green-600">
-                  Location: {employeeWarehouse.latitude}, {employeeWarehouse.longitude}
-                </p>
-              </div>
-              
-              {/* Store Selection */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-green-800">Vendors (Display Only):</label>
-                <div className="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50">
-                  {stores.length > 0 ? (
-                    stores.map((store, idx) => {
-                      const selectedStore = availableStores.find(s => s.latitude === store.lat && s.longitude === store.lon);
-                      return (
-                        <div key={idx} className="flex items-center mb-2 text-gray-700">
-                          <span className="font-semibold mr-2">{selectedStore?.name || `Store ${idx + 1}`}</span>
-                          <span className="text-xs text-gray-500">({store.lat}, {store.lon})</span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-gray-500 text-sm">No stores selected</p>
-                  )}
-                </div>
+            )}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column - Controls */}
+              <div>
+                {/* Employee Warehouse Info */}
+                {initializing ? (
+                  <div className="mb-6 p-4 border rounded bg-blue-50">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+                      <p className="text-blue-700">Loading your warehouse information...</p>
+                    </div>
+                  </div>
+                ) : employeeWarehouse ? (
+                  <div className="mb-6 p-4 border rounded bg-green-50">
+                    <h2 className="font-semibold mb-4 text-green-800">Your Warehouse</h2>
+                    <div className="mb-4">
+                      <p className="text-green-700 font-medium">{employeeWarehouse.name}</p>
+                      <p className="text-sm text-green-600">
+                        Location: {employeeWarehouse.latitude}, {employeeWarehouse.longitude}
+                      </p>
+                    </div>
+                    
+                    {/* Store Selection */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-2 text-green-800">Vendors (Display Only):</label>
+                      <div className="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50">
+                        {stores.length > 0 ? (
+                          stores.map((store, idx) => {
+                            const selectedStore = availableStores.find(s => s.latitude === store.lat && s.longitude === store.lon);
+                            return (
+                              <div key={idx} className="flex items-center mb-2 text-gray-700">
+                                <span className="font-semibold mr-2">{selectedStore?.name || `Store ${idx + 1}`}</span>
+                                <span className="text-xs text-gray-500">({store.lat}, {store.lon})</span>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="text-gray-500 text-sm">No stores selected</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={loadSelectedStores}
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                      disabled={selectedStoreIds.length === 0}
+                    >
+                      Load Selected Stores
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-6 p-4 border rounded bg-red-50">
+                    <h2 className="font-semibold mb-4 text-red-800">Warehouse Assignment Required</h2>
+                    <p className="text-red-700">
+                      You are not assigned to a warehouse. Please contact your administrator to get assigned to a warehouse.
+                    </p>
+                  </div>
+                )}
+                
+                {/* Removed Generate Distance Matrix button as it's no longer needed */}
+                
+                {error && <div className="text-red-600 mb-2">{error}</div>}
+                
+                {matrix && (
+                  <div className="mb-4">
+                    <h2 className="font-semibold mb-2">Distance Matrix Output</h2>
+                    <textarea
+                      className="w-full border rounded p-2"
+                      rows={Math.max(4, matrix.length + 1)}
+                      value={exportMatrix()}
+                      readOnly
+                    />
+                  </div>
+                )}
+
+                {routeResult && routeResult.success && (
+                  <div className="mb-4 p-4 border rounded bg-green-50">
+                    <h2 className="font-semibold mb-2 text-green-800">Shortest Route Results</h2>
+                    
+                    <div className="mb-3">
+                      <span className="font-medium text-green-700">Minimum Cost: </span>
+                      <span className="text-green-600 font-bold">{(routeResult.minimumCost / 1000).toFixed(2)} km</span>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <span className="font-medium text-green-700">Optimal Tour: </span>
+                      <div className="mt-1 p-2 bg-white border rounded">
+                        {routeResult.tour.map((node, index) => (
+                          <span key={index}>
+                            <span className="font-mono text-green-600">{node}</span>
+                            <span className="text-green-700"> ({getLocationName(node)})</span>
+                            {index < routeResult.tour.length - 1 && (
+                              <span className="text-green-500 mx-2">→</span>
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm text-green-600">
+                      <p><strong>Route Summary:</strong></p>
+                      <p>Start at Warehouse → Visit all stores in optimal order → Return to Warehouse</p>
+                      <p>Total distance: {(routeResult.minimumCost / 1000).toFixed(2)} km</p>
+                    </div>
+                  </div>
+                )}
+
+                {routeResult && !routeResult.success && (
+                  <div className="mb-4 p-4 border rounded bg-red-50">
+                    <h2 className="font-semibold mb-2 text-red-800">Route Calculation Failed</h2>
+                    <p className="text-red-600">{routeResult.error}</p>
+                  </div>
+                )}
               </div>
 
-              <button 
-                onClick={loadSelectedStores}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                disabled={selectedStoreIds.length === 0}
-              >
-                Load Selected Stores
-              </button>
-            </div>
-          ) : (
-            <div className="mb-6 p-4 border rounded bg-red-50">
-              <h2 className="font-semibold mb-4 text-red-800">Warehouse Assignment Required</h2>
-              <p className="text-red-700">
-                You are not assigned to a warehouse. Please contact your administrator to get assigned to a warehouse.
-              </p>
-            </div>
-          )}
-          
-          {/* Removed Generate Distance Matrix button as it's no longer needed */}
-          
-          {error && <div className="text-red-600 mb-2">{error}</div>}
-          
-          {matrix && (
-            <div className="mb-4">
-              <h2 className="font-semibold mb-2">Distance Matrix Output</h2>
-              <textarea
-                className="w-full border rounded p-2"
-                rows={Math.max(4, matrix.length + 1)}
-                value={exportMatrix()}
-                readOnly
-              />
-            </div>
-          )}
-
-          {routeResult && routeResult.success && (
-            <div className="mb-4 p-4 border rounded bg-green-50">
-              <h2 className="font-semibold mb-2 text-green-800">Shortest Route Results</h2>
-              
-              <div className="mb-3">
-                <span className="font-medium text-green-700">Minimum Cost: </span>
-                <span className="text-green-600 font-bold">{(routeResult.minimumCost / 1000).toFixed(2)} km</span>
+              {/* Right Column - Map */}
+              <div>
+                <h2 className="font-semibold mb-4">Route Visualization</h2>
+                <RouteMap
+                  warehouse={warehouse}
+                  stores={stores}
+                  tour={routeResult?.success ? routeResult.tour : null}
+                  warehouseName={getWarehouseName()}
+                  storeNames={getStoreNames()}
+                  loading={loading || calculatingRoute}
+                />
               </div>
-              
-              <div className="mb-3">
-                <span className="font-medium text-green-700">Optimal Tour: </span>
-                <div className="mt-1 p-2 bg-white border rounded">
-                  {routeResult.tour.map((node, index) => (
-                    <span key={index}>
-                      <span className="font-mono text-green-600">{node}</span>
-                      <span className="text-green-700"> ({getLocationName(node)})</span>
-                      {index < routeResult.tour.length - 1 && (
-                        <span className="text-green-500 mx-2">→</span>
-                      )}
+            </div>
+            {/* Route details for selected truck */}
+            {truckRoutes.length > 0 && truckRoutes[selectedTruckIdx] && (
+              <div className="mb-4 p-4 border rounded bg-blue-50 shadow">
+                <h2 className="font-semibold mb-2 text-blue-800 text-lg flex items-center gap-2">
+                  <span>🚚 Truck {selectedTruckIdx + 1} Route Details</span>
+                </h2>
+                <div className="mb-2 flex flex-wrap gap-2 items-center">
+                  <span className="font-medium text-blue-700">Destinations:</span>
+                  {assignedTrucks[selectedTruckIdx]?.destinations?.map((dest: string, i: number) => (
+                    <span key={i} className="bg-blue-200 text-blue-900 px-2 py-1 rounded text-xs font-mono">
+                      {dest}
                     </span>
                   ))}
                 </div>
+                <div className="mb-2 flex flex-wrap gap-2 items-center">
+                  <span className="font-medium text-blue-700">Items:</span>
+                  {assignedTrucks[selectedTruckIdx]?.items?.map((item: any, i: number) => (
+                    <span key={i} className="bg-green-200 text-green-900 px-2 py-1 rounded text-xs font-mono">
+                      {itemIdNameMap[item.itemId] || item.itemId} (qty: {item.quantity}) from {getVendorName(item.vendorId)}
+                    </span>
+                  ))}
+                </div>
+                <div className="mb-2">
+                  <span className="font-medium text-blue-700">Minimum Cost: </span>
+                  <span className="text-blue-600 font-bold">{(truckRoutes[selectedTruckIdx].routeResult?.minimumCost / 1000).toFixed(2)} km</span>
+                </div>
+                <div className="mb-2">
+                  <span className="font-medium text-blue-700">Optimal Tour: </span>
+                  <span className="text-blue-600 font-mono">
+                    {truckRoutes[selectedTruckIdx].routeResult?.tour?.join(' → ')}
+                  </span>
+                </div>
               </div>
-              
-              <div className="text-sm text-green-600">
-                <p><strong>Route Summary:</strong></p>
-                <p>Start at Warehouse → Visit all stores in optimal order → Return to Warehouse</p>
-                <p>Total distance: {(routeResult.minimumCost / 1000).toFixed(2)} km</p>
-              </div>
-            </div>
-          )}
-
-          {routeResult && !routeResult.success && (
-            <div className="mb-4 p-4 border rounded bg-red-50">
-              <h2 className="font-semibold mb-2 text-red-800">Route Calculation Failed</h2>
-              <p className="text-red-600">{routeResult.error}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column - Map */}
-        <div>
-          <h2 className="font-semibold mb-4">Route Visualization</h2>
-          <RouteMap
-            warehouse={warehouse}
-            stores={stores}
-            tour={routeResult?.success ? routeResult.tour : null}
-            warehouseName={getWarehouseName()}
-            storeNames={getStoreNames()}
-            loading={loading || calculatingRoute}
-          />
+            )}
+          </div>
         </div>
       </div>
-      {/* Route details for selected truck */}
-      {truckRoutes.length > 0 && truckRoutes[selectedTruckIdx] && (
-        <div className="mb-4 p-4 border rounded bg-blue-50 shadow">
-          <h2 className="font-semibold mb-2 text-blue-800 text-lg flex items-center gap-2">
-            <span>🚚 Truck {selectedTruckIdx + 1} Route Details</span>
-          </h2>
-          <div className="mb-2 flex flex-wrap gap-2 items-center">
-            <span className="font-medium text-blue-700">Destinations:</span>
-            {assignedTrucks[selectedTruckIdx]?.destinations?.map((dest: string, i: number) => (
-              <span key={i} className="bg-blue-200 text-blue-900 px-2 py-1 rounded text-xs font-mono">
-                {dest}
-              </span>
-            ))}
-          </div>
-          <div className="mb-2 flex flex-wrap gap-2 items-center">
-            <span className="font-medium text-blue-700">Items:</span>
-            {assignedTrucks[selectedTruckIdx]?.items?.map((item: any, i: number) => (
-              <span key={i} className="bg-green-200 text-green-900 px-2 py-1 rounded text-xs font-mono">
-                {itemIdNameMap[item.itemId] || item.itemId} (qty: {item.quantity}) from {getVendorName(item.vendorId)}
-              </span>
-            ))}
-          </div>
-          <div className="mb-2">
-            <span className="font-medium text-blue-700">Minimum Cost: </span>
-            <span className="text-blue-600 font-bold">{(truckRoutes[selectedTruckIdx].routeResult?.minimumCost / 1000).toFixed(2)} km</span>
-          </div>
-          <div className="mb-2">
-            <span className="font-medium text-blue-700">Optimal Tour: </span>
-            <span className="text-blue-600 font-mono">
-              {truckRoutes[selectedTruckIdx].routeResult?.tour?.join(' → ')}
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

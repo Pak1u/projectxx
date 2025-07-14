@@ -44,7 +44,7 @@ function OfferDistanceDisplay({ offerId, offerDistances }: { offerId: string; of
   );
 }
 
-export default function RequestDetailPage() {
+export default function MarketplaceRequestDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const [request, setRequest] = useState<any>(null);
@@ -153,73 +153,89 @@ export default function RequestDetailPage() {
   };
 
   return (
-    <ProtectedRoute requiredRole={user?.role === 'VENDOR' ? 'VENDOR' : 'EMPLOYEE'}>
-      <div className="flex flex-col items-center justify-center min-h-[60vh] w-full px-4">
-        {toast && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow z-50">
-            {toast}
-            <button className="ml-2 text-white font-bold" onClick={() => setToast(null)}>&times;</button>
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-green-50 to-white flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+      {/* Decorative background shapes */}
+      <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full opacity-30 blur-2xl -z-10" style={{top: '-4rem', left: '-4rem'}} />
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-100 rounded-full opacity-30 blur-2xl -z-10" style={{bottom: '-4rem', right: '-4rem'}} />
+      <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg">Request Details</h2>
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-0 overflow-hidden animate-fade-in-up">
+        {/* Unified Gradient Header */}
+        <div className="flex items-center bg-gradient-to-r from-blue-600 to-teal-500 p-6">
+          <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg mr-4">
+            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
           </div>
-        )}
-        <h2 className="text-3xl font-semibold mb-6">Request Details</h2>
-        {loading ? (
-          <p>Loading request...</p>
-        ) : !request ? (
-          <p>Request not found.</p>
-        ) : (
-          <div className="w-full max-w-2xl bg-white rounded-lg shadow p-6">
-            <div className="mb-4">
-              <span className="font-semibold">Item:</span> {request.itemName}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">Quantity:</span> {request.quantity}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">Warehouse:</span> {request.warehouse?.name}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">Requested by:</span> {request.employee?.name}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">Offers:</span>
-              {request.offers && request.offers.length > 0 ? (
-                <ul className="mt-2 space-y-2">
-                  {request.offers.map((offer: any) => (
-                    <li key={offer.id} className="border rounded p-3 flex flex-col md:flex-row md:items-center md:justify-between">
-                      <div>
-                        Vendor: {offer.vendor?.name || 'Unknown'} | Qty: {offer.quantity} | Status: {offer.status}
-                        {user?.role === 'EMPLOYEE' && (
-                          <OfferDistanceDisplay offerId={offer.id} offerDistances={offerDistances} />
-                        )}
-                      </div>
-                      {user?.role === 'EMPLOYEE' && request.warehouseId === user?.employee?.warehouseId && offer.status === 'PENDING' && (
-                        <div className="flex gap-2 mt-2 md:mt-0">
-                          <button
-                            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
-                            disabled={actionLoading === offer.id + 'ACCEPTED'}
-                            onClick={() => handleOfferAction(offer.id, 'ACCEPTED')}
-                          >
-                            {actionLoading === offer.id + 'ACCEPTED' ? 'Accepting...' : 'Accept'}
-                          </button>
-                          <button
-                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
-                            disabled={actionLoading === offer.id + 'REJECTED'}
-                            onClick={() => handleOfferAction(offer.id, 'REJECTED')}
-                          >
-                            {actionLoading === offer.id + 'REJECTED' ? 'Rejecting...' : 'Reject'}
-                          </button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="text-gray-500">No offers yet.</div>
-              )}
-            </div>
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-1">Request Information</h3>
+            <p className="text-blue-100">See all details and take action on this inventory request.</p>
           </div>
-        )}
+        </div>
+        <div className="p-8 space-y-8">
+          {/* Place your request details content/components here, e.g. item info, offer form, etc. */}
+          {/* Example placeholder: */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h2 className="text-lg font-semibold mb-4">Request Details</h2>
+            {/* Render your request details here, keeping the original logic */}
+            {loading ? (
+              <p>Loading request...</p>
+            ) : !request ? (
+              <p>Request not found.</p>
+            ) : (
+              <div className="w-full max-w-2xl bg-white rounded-lg shadow p-6">
+                <div className="mb-4">
+                  <span className="font-semibold">Item:</span> {request.itemName}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Quantity:</span> {request.quantity}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Warehouse:</span> {request.warehouse?.name}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Requested by:</span> {request.employee?.name}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Offers:</span>
+                  {request.offers && request.offers.length > 0 ? (
+                    <ul className="mt-2 space-y-2">
+                      {request.offers.map((offer: any) => (
+                        <li key={offer.id} className="border rounded p-3 flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div>
+                            Vendor: {offer.vendor?.name || 'Unknown'} | Qty: {offer.quantity} | Status: {offer.status}
+                            {user?.role === 'EMPLOYEE' && (
+                              <OfferDistanceDisplay offerId={offer.id} offerDistances={offerDistances} />
+                            )}
+                          </div>
+                          {user?.role === 'EMPLOYEE' && request.warehouseId === user?.employee?.warehouseId && offer.status === 'PENDING' && (
+                            <div className="flex gap-2 mt-2 md:mt-0">
+                              <button
+                                className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
+                                disabled={actionLoading === offer.id + 'ACCEPTED'}
+                                onClick={() => handleOfferAction(offer.id, 'ACCEPTED')}
+                              >
+                                {actionLoading === offer.id + 'ACCEPTED' ? 'Accepting...' : 'Accept'}
+                              </button>
+                              <button
+                                className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+                                disabled={actionLoading === offer.id + 'REJECTED'}
+                                onClick={() => handleOfferAction(offer.id, 'REJECTED')}
+                              >
+                                {actionLoading === offer.id + 'REJECTED' ? 'Rejecting...' : 'Reject'}
+                              </button>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-gray-500">No offers yet.</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Add more sections/cards as needed, following the same UI style */}
+        </div>
       </div>
-    </ProtectedRoute>
+    </div>
   );
 } 
