@@ -227,10 +227,14 @@ export default function AssignTrucks() {
               });
             }
           });
+          // Find the vendor in the vendors array to get coordinates
+          const vendorObj = vendors.find(v => v.id === assignment.vendorId);
           return {
             vendorId: assignment.vendorId,
             vendorName: assignment.vendorName,
             items: Array.from(itemMap.values()),
+            lat: vendorObj?.user?.latitude ?? null,
+            lon: vendorObj?.user?.longitude ?? null,
           };
         });
 
@@ -240,16 +244,27 @@ export default function AssignTrucks() {
         return;
       }
 
-      // Build the input string for the C++ program
-      let cppInput = `${processedData.length}\n`;
-      processedData.forEach(vendor => {
-        cppInput += `${vendor.vendorId}\n`;
-        cppInput += `${vendor.items.length}\n`;
-        vendor.items.forEach(item => {
-          cppInput += `${item.itemId} ${item.quantity} ${item.volume}\n`;
+      // Fetch warehouse coordinates from the first vendor's warehouse (or from context if available)
+      let warehouseCoords = null;
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/api/route-coordinates/employee`, {
+          headers: { 'Authorization': `Bearer ${token}` },
         });
-      });
-      cppInput += `${truckVolume}\n`;
+        if (response.ok) {
+          const data = await response.json();
+          if (data.warehouse && typeof data.warehouse.latitude === 'number' && typeof data.warehouse.longitude === 'number') {
+            warehouseCoords = { lat: data.warehouse.latitude, lon: data.warehouse.longitude };
+          }
+        }
+      } catch (err) {
+        // fallback: do nothing
+      }
+      if (!warehouseCoords) {
+        setError('Could not determine warehouse coordinates');
+        setIsLoading(false);
+        return;
+      }
 
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE}/api/employee/assign-trucks`, {
@@ -261,7 +276,7 @@ export default function AssignTrucks() {
         body: JSON.stringify({
           vendors: processedData,
           truckVolume: truckVolume,
-          cppInput: cppInput, // send the raw input string for the backend to use
+          warehouse: warehouseCoords,
         }),
       });
 

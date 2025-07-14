@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Replace with your actual warehouse ID
-  const warehouseId = 'cmcv1tkzo0007nf9cp0g7ts82';
+  const warehouseId = 'cmd2x0l310003nf0o6uznsbz7';
 
   const items = [
     { itemName: "Rice", quantity: 20, price: 466.22 },

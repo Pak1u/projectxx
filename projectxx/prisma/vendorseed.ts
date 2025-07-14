@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 async function main() {
   // Replace with your actual vendor ID
  
-  const vendorId = 'cmcv1v3oe000bnf9c5y770o1a';
+  const vendorId = 'cmd2x14yn0007nf0oyay22y6q';
 
   const items = [
     { itemName: "Toilet Paper", quantity: 150, price: 165.82 },

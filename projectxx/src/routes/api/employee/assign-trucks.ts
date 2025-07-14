@@ -37,9 +37,73 @@ router.post('/', authenticateToken, requireAuth, requireRole('EMPLOYEE'), async 
         }
       }
       input += `${truckVolume}\n`;
+
+      // === NEW: Build the distance matrix ===
+      try {
+        // 1. Get warehouse and vendor coordinates
+        const warehouse = req.body.warehouse; // { lat, lon }
+        if (!warehouse || typeof warehouse.lat !== 'number' || typeof warehouse.lon !== 'number') {
+          res.status(400).json({ error: 'Warehouse coordinates are required in the request body.' });
+          return;
+        }
+        const vendorCoords = vendors.map((v: any) => {
+          if (typeof v.lat !== 'number' || typeof v.lon !== 'number') {
+            throw new Error('Each vendor must have lat and lon fields.');
+          }
+          return { lat: v.lat, lon: v.lon };
+        });
+
+        // 2. Build locations array: [warehouse, ...vendors]
+        const locations = [warehouse, ...vendorCoords];
+        const m = locations.length;
+
+        // 3. Build distance matrix
+        const distanceMatrix: number[][] = [];
+        for (let i = 0; i < m; ++i) {
+          distanceMatrix[i] = [];
+          for (let j = 0; j < m; ++j) {
+            if (i === j) {
+              distanceMatrix[i][j] = 0;
+            } else {
+              try {
+                const data = await fetchWithRetry(
+                  'http://localhost:4000/api/ors-distance',
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ coord1: locations[i], coord2: locations[j] }),
+                  }
+                );
+                if (typeof data.distance !== 'number') {
+                  throw new Error(data.error || 'Failed to fetch distance');
+                }
+                distanceMatrix[i][j] = data.distance;
+              } catch (fetchErr) {
+                console.error(`Error fetching distance for (${i},${j}):`, fetchErr);
+                res.status(500).json({ error: `Failed to fetch distance for (${i},${j})`, details: (fetchErr as Error).message });
+                return;
+              }
+            }
+          }
+        }
+
+        // 4. Append to input
+        console.log('Distance matrix to be appended:', distanceMatrix);
+        input += `${m}\n`;
+        for (let i = 0; i < m; ++i) {
+          for (let j = 0; j < m; ++j) {
+            input += `${distanceMatrix[i][j]} `;
+          }
+          input += '\n';
+        }
+      } catch (err) {
+        console.error('Error building distance matrix:', err);
+        res.status(500).json({ error: 'Failed to build distance matrix', details: (err as Error).message });
+        return;
+      }
     }
 
-    console.log('Input for C++ program:', input);
+    console.log('Final input for C++ program:\n', input);
 
     // Run the C++ program
     const cppExecutablePath = path.join(__dirname, '../truck-distribute-optimised.exe');
@@ -97,6 +161,19 @@ router.post('/', authenticateToken, requireAuth, requireRole('EMPLOYEE'), async 
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Add fetchWithRetry helper
+async function fetchWithRetry(url: string, options: any, retries = 5, delayMs = 1000): Promise<any> {
+  for (let attempt = 0; attempt < retries; ++attempt) {
+    const resp = await fetch(url, options);
+    if (resp.ok) {
+      return await resp.json();
+    }
+    // If rate limited or failed, wait and retry
+    await new Promise(res => setTimeout(res, delayMs));
+  }
+  throw new Error('Failed to fetch after retries');
+}
 
 // Helper function to parse C++ program output
 function parseCppOutput(output: string, vendors: any[]): any[] {

@@ -1,8 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/register/page": "app/register/page.js",
-  "/vendor/dashboard/page": "app/vendor/dashboard/page.js",
   "/employee/assign-trucks/page": "app/employee/assign-trucks/page.js",
+  "/page": "app/page.js",
   "/employee/route-planner/page": "app/employee/route-planner/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js"
+  "/login/page": "app/login/page.js",
+  "/employee/dashboard/page": "app/employee/dashboard/page.js"
 }

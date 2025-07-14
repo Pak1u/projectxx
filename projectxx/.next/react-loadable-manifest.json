@@ -1,18 +1,6 @@
 {
-  "app\\admin\\dashboard\\page.tsx -> ../../register/MapPicker": {
-    "id": "app\\admin\\dashboard\\page.tsx -> ../../register/MapPicker",
-    "files": [
-      "static/chunks/_app-pages-browser_app_register_MapPicker_tsx.js"
-    ]
-  },
   "app\\components\\RouteMap.tsx -> react-leaflet": {
     "id": "app\\components\\RouteMap.tsx -> react-leaflet",
     "files": []
-  },
-  "app\\register\\page.tsx -> ./MapPicker": {
-    "id": "app\\register\\page.tsx -> ./MapPicker",
-    "files": [
-      "static/chunks/_app-pages-browser_app_register_MapPicker_tsx.js"
-    ]
   }
 }
